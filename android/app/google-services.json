@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "552149597115",
+    "project_id": "flutter-assignment-ebutler",
+    "storage_bucket": "flutter-assignment-ebutler.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:552149597115:android:ed55a2ad11d17b78aea29e",
+        "android_client_info": {
+          "package_name": "com.assignment.ebutler"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "552149597115-jtuibp1rl9618m3qoji2ps13fqvo9307.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB-M_PCX6je_msNHci3QO4W2-fgIFjbIrk"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "552149597115-jtuibp1rl9618m3qoji2ps13fqvo9307.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
