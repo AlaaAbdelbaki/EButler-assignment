@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ebutler/firebase_options.dart';
 import 'package:ebutler/providers/user.provider.dart';
 import 'package:ebutler/routes/routes.dart';
-import 'package:ebutler/utils.dart';
+import 'package:ebutler/utils/utils.dart';
 import 'package:ebutler/utils/constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
