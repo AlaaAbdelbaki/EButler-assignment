@@ -3,6 +3,7 @@
 
 import 'dart:convert';
 
+import 'package:ebutler/classes/locations.class.dart';
 import 'package:intl_phone_field/phone_number.dart';
 
 enum Role {
@@ -17,12 +18,14 @@ class UserModel {
   final PhoneNumber? phoneNumber;
   String? image;
   final Role? role;
+  final List<Location>? positions;
   UserModel({
     required this.uid,
     required this.email,
     this.name,
     this.phoneNumber,
     this.role,
+    this.positions,
   });
 
   UserModel copyWith({
@@ -31,6 +34,7 @@ class UserModel {
     String? name,
     PhoneNumber? phoneNumber,
     Role? role,
+    List<Location>? positions,
   }) {
     return UserModel(
       uid: uid ?? this.uid,
@@ -38,6 +42,7 @@ class UserModel {
       name: name ?? this.name,
       phoneNumber: phoneNumber ?? this.phoneNumber,
       role: role ?? this.role,
+      positions: positions ?? this.positions,
     );
   }
 
@@ -52,6 +57,11 @@ class UserModel {
         'countryISOCode': phoneNumber?.countryISOCode,
       },
       'role': role?.name,
+      'positions': positions
+          ?.map(
+            (e) => e.toMap(),
+          )
+          .toList()
     };
   }
 
@@ -74,6 +84,13 @@ class UserModel {
                   element.name.toLowerCase() ==
                   (map['role'] as String).toLowerCase(),
             ),
+      positions: map['locations'] == null
+          ? null
+          : List<Location>.from(
+              (map['locations'] as List<dynamic>).map<Location>(
+                (e) => Location.fromMap(e),
+              ),
+            ),
     );
   }
 
@@ -84,7 +101,7 @@ class UserModel {
 
   @override
   String toString() {
-    return 'UserModel(id: $uid, email: $email, name: $name, phoneNumber: $phoneNumber, role: ${role?.name})';
+    return 'UserModel(id: $uid, email: $email, name: $name, phoneNumber: $phoneNumber, role: ${role?.name}, positions: ${positions?.toString()})';
   }
 
   @override
@@ -95,7 +112,8 @@ class UserModel {
         other.email == email &&
         other.name == name &&
         other.phoneNumber == phoneNumber &&
-        other.role == role;
+        other.role == role &&
+        other.positions == positions;
   }
 
   @override
@@ -104,6 +122,7 @@ class UserModel {
         email.hashCode ^
         name.hashCode ^
         phoneNumber.hashCode ^
-        role.hashCode;
+        role.hashCode ^
+        positions.hashCode;
   }
 }

@@ -1,9 +1,13 @@
+import 'dart:async';
+
+import 'package:ebutler/classes/locations.class.dart';
+import 'package:ebutler/interfaces/user.interface.dart';
 import 'package:ebutler/models/user.model.dart';
 import 'package:ebutler/services/user.services.dart';
 import 'package:flutter/material.dart';
 import 'package:intl_phone_field/phone_number.dart';
 
-class UserProvider extends ChangeNotifier {
+class UserProvider extends ChangeNotifier implements IUserServices {
   UserModel? _user;
 
   UserModel get user => _user!;
@@ -13,7 +17,8 @@ class UserProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> registerUserWithEmailAndPassword(
+  @override
+  Future<void> registerUserWithEmail(
     String email,
     String password,
   ) async {
@@ -28,7 +33,8 @@ class UserProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> loginWithEmailAndPassword(String email, String password) async {
+  @override
+  Future<void> loginWithEmail(String email, String password) async {
     try {
       final UserServices userServices = UserServices();
       await userServices.loginWithEmail(email, password);
@@ -38,6 +44,7 @@ class UserProvider extends ChangeNotifier {
   }
 
   /// Fetches the user details using the credentials found on the Fireauth instance
+  @override
   Future<UserModel> getUserDetails() async {
     try {
       final UserModel userModel = await UserServices().getUserDetails();
@@ -49,6 +56,7 @@ class UserProvider extends ChangeNotifier {
   }
 
   /// Completes a user profile using the provided [name] [phoneNumber] and [role]
+  @override
   Future<void> completeProfile(
     String name,
     PhoneNumber phoneNumber,
@@ -56,6 +64,34 @@ class UserProvider extends ChangeNotifier {
   ) async {
     try {
       await UserServices().completeProfile(name, phoneNumber, role);
+      await getUserDetails();
+    } catch (e) {
+      return Future.error(e);
+    }
+  }
+
+  /// Uploads a profile picture to the storage using the provided [path]
+  @override
+  Future<void> uploadProfilePicture(String path) async {
+    try {
+      await UserServices().uploadProfilePicture(path);
+    } catch (e) {
+      return Future.error(e);
+    }
+  }
+
+  /// Logs out the user completely from the application
+  @override
+  Future<void> logout() async {
+    await UserServices().logout();
+    _user = null;
+    notifyListeners();
+  }
+
+  @override
+  Future<void> addPosition(Location location) async {
+    try {
+      await UserServices().addPosition(location);
       await getUserDetails();
     } catch (e) {
       return Future.error(e);

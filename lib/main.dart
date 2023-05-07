@@ -1,11 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ebutler/firebase_options.dart';
+import 'package:ebutler/providers/system.provider.dart';
 import 'package:ebutler/providers/user.provider.dart';
 import 'package:ebutler/routes/routes.dart';
 import 'package:ebutler/utils/utils.dart';
 import 'package:ebutler/utils/constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -15,9 +17,10 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   // Use emulators if running in debug mode
-  if (kDebugMode) {
+  if (!kReleaseMode) {
     FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080);
     await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
+    await FirebaseStorage.instance.useStorageEmulator('localhost', 9199);
   }
 
   setPathUrlStrategy();
@@ -26,6 +29,9 @@ void main() async {
       providers: [
         ChangeNotifierProvider(
           create: (_) => UserProvider(),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => SystemProvider(),
         ),
       ],
       child: const MyApp(),
@@ -45,6 +51,7 @@ class MyApp extends StatelessWidget {
         title: 'EButler',
         theme: ThemeData(
           primarySwatch: createMaterialColor(const Color(0xFF0077b6)),
+          dividerColor: Colors.transparent,
           inputDecorationTheme: Theme.of(context).inputDecorationTheme.copyWith(
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(
@@ -70,7 +77,7 @@ class MyApp extends StatelessWidget {
             ),
           ),
         ),
-        routerConfig: AppRouter().router,
+        routerConfig: router,
       ),
     );
   }
