@@ -1,6 +1,6 @@
 import 'package:ebutler/screens/complete_profile/complete_profile.mobile.dart';
 import 'package:ebutler/screens/complete_profile/complete_profile.web.dart';
-import 'package:ebutler/utils/constants.dart';
+import 'package:ebutler/widgets/responsive_builder.dart';
 import 'package:flutter/material.dart';
 
 class CompleteProfile extends StatelessWidget {
@@ -8,13 +8,9 @@ class CompleteProfile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        if (constraints.maxWidth < MOBILE_BREAKPOINT) {
-          return const CompleteProfileMobile();
-        }
-        return const CompleteProfileWeb();
-      },
+    return const ResponsiveBuilder(
+      mobilePage: CompleteProfileMobile(),
+      mdWebPage: CompleteProfileWeb(),
     );
   }
 }

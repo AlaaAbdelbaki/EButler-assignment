@@ -1,12 +1,16 @@
+import 'dart:developer';
+
 import 'package:ebutler/models/user.model.dart';
 import 'package:ebutler/providers/user.provider.dart';
 import 'package:ebutler/utils/constants.dart';
 import 'package:ebutler/utils/extensions.dart';
 import 'package:ebutler/widgets/alert.dart';
 import 'package:ebutler/widgets/async_button.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:heroicons/heroicons.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:intl_phone_field/phone_number.dart';
 import 'package:provider/provider.dart';
@@ -26,6 +30,8 @@ class _CompleteProfileMobileState extends State<CompleteProfileMobile> {
   PhoneNumber? _selectedPhoneNumber;
   Role? _selectedRole;
 
+  ValueKey imageKey = const ValueKey('image');
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -43,6 +49,66 @@ class _CompleteProfileMobileState extends State<CompleteProfileMobile> {
                     style: TextStyle(
                       fontSize: 60,
                       fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 20),
+                  child: GestureDetector(
+                    onTap: () async {
+                      showModalBottomSheet(
+                        context: context,
+                        backgroundColor: Colors.transparent,
+                        builder: (context) => Material(
+                          elevation: 5,
+                          borderRadius: const BorderRadius.only(
+                            topLeft: Radius.circular(radius),
+                            topRight: Radius.circular(radius),
+                          ),
+                          clipBehavior: Clip.hardEdge,
+                          child: Padding(
+                            padding: const EdgeInsets.all(20),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                ListTile(
+                                  onTap: () async {
+                                    await uploadImage(ImageSource.camera);
+                                  },
+                                  leading: const HeroIcon(
+                                    HeroIcons.camera,
+                                  ),
+                                  title: const Text('Take a picture'),
+                                ),
+                                ListTile(
+                                  onTap: () async {
+                                    await uploadImage(ImageSource.gallery);
+                                  },
+                                  leading: const HeroIcon(
+                                    HeroIcons.photo,
+                                  ),
+                                  title: const Text('Upload from gallery'),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                    child: Center(
+                      child: CircleAvatar(
+                        key: imageKey,
+                        backgroundImage: const AssetImage(
+                          'assets/images/profile.jpeg',
+                        ),
+                        radius: 60,
+                        foregroundImage:
+                            FirebaseAuth.instance.currentUser!.photoURL == null
+                                ? null
+                                : NetworkImage(
+                                    '${FirebaseAuth.instance.currentUser?.photoURL}',
+                                  ),
+                      ),
                     ),
                   ),
                 ),
@@ -142,7 +208,7 @@ class _CompleteProfileMobileState extends State<CompleteProfileMobile> {
                             _selectedRole!,
                           );
                           if (!mounted) return;
-                          context.go('/');
+                          context.go('/chat');
                         } catch (e) {
                           showDialog(
                             context: context,
@@ -163,5 +229,27 @@ class _CompleteProfileMobileState extends State<CompleteProfileMobile> {
         ),
       ),
     );
+  }
+
+  Future<void> uploadImage(ImageSource source) async {
+    final UserProvider userProvider =
+        Provider.of<UserProvider>(context, listen: false);
+    final XFile? pickedFile = await ImagePicker().pickImage(
+      source: source,
+      imageQuality: 50,
+    );
+    if (pickedFile == null) return;
+
+    try {
+      await userProvider.uploadProfilePicture(pickedFile.path);
+      await FirebaseAuth.instance.currentUser!.reload();
+    } catch (e) {
+      log('$e');
+    }
+    setState(() {
+      imageKey = ValueKey('${DateTime.now().millisecondsSinceEpoch}');
+    });
+    if (!mounted) return;
+    context.pop();
   }
 }

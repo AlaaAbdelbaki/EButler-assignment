@@ -178,7 +178,7 @@ class _CompleteProfileWebState extends State<CompleteProfileWeb> {
                                   _selectedRole!,
                                 );
                                 if (!mounted) return;
-                                context.go('/');
+                                context.go('/chat');
                               } catch (e) {
                                 showDialog(
                                   context: context,
