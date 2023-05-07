@@ -153,12 +153,12 @@ class _LoginWebState extends State<LoginWeb> {
                                     await Provider.of<UserProvider>(
                                       context,
                                       listen: false,
-                                    ).loginWithEmailAndPassword(
+                                    ).loginWithEmail(
                                       _emailController.text.trim(),
                                       _passwordController.text,
                                     );
                                     if (!mounted) return;
-                                    context.go('/');
+                                    context.go('/chat');
                                   } catch (e) {
                                     showDialog(
                                       context: context,

@@ -1,6 +1,6 @@
 import 'package:ebutler/screens/login/login.mobile.dart';
 import 'package:ebutler/screens/login/login.web.dart';
-import 'package:ebutler/utils/constants.dart';
+import 'package:ebutler/widgets/responsive_builder.dart';
 import 'package:flutter/material.dart';
 
 class Login extends StatelessWidget {
@@ -8,13 +8,9 @@ class Login extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constaints) {
-        if (constaints.maxWidth < MOBILE_BREAKPOINT) {
-          return const LoginMobile();
-        }
-        return const LoginWeb();
-      },
+    return const ResponsiveBuilder(
+      mobilePage: LoginMobile(),
+      mdWebPage: LoginWeb(),
     );
   }
 }

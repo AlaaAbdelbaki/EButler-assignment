@@ -1,6 +1,7 @@
-import 'package:ebutler/screens/register/register_mobile.dart';
-import 'package:ebutler/screens/register/register_web.dart';
-import 'package:ebutler/utils/constants.dart';
+import 'package:ebutler/screens/register/register.mobile.dart';
+import 'package:ebutler/screens/register/register.web.dart';
+
+import 'package:ebutler/widgets/responsive_builder.dart';
 import 'package:flutter/material.dart';
 
 class Register extends StatelessWidget {
@@ -8,13 +9,9 @@ class Register extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, breakpoints) {
-        if (breakpoints.maxWidth < MOBILE_BREAKPOINT) {
-          return const RegisterMobile();
-        }
-        return const RegisterWeb();
-      },
+    return const ResponsiveBuilder(
+      mobilePage: RegisterMobile(),
+      mdWebPage: RegisterWeb(),
     );
   }
 }

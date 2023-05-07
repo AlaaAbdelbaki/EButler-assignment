@@ -138,12 +138,12 @@ class _LoginMobileState extends State<LoginMobile> {
                         final UserProvider userProvider =
                             Provider.of<UserProvider>(context, listen: false);
                         try {
-                          await userProvider.loginWithEmailAndPassword(
+                          await userProvider.loginWithEmail(
                             _emailController.text.trim(),
                             _passwordController.text,
                           );
                           if (!mounted) return;
-                          context.go('/');
+                          context.go('/chat');
                         } catch (e) {
                           showDialog(
                             context: context,

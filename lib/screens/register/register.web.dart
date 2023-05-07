@@ -172,7 +172,7 @@ class _RegisterWebState extends State<RegisterWeb> {
                                     await Provider.of<UserProvider>(
                                       context,
                                       listen: false,
-                                    ).registerUserWithEmailAndPassword(
+                                    ).registerUserWithEmail(
                                       _emailController.text.trim(),
                                       _passwordController.text,
                                     );

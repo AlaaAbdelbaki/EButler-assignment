@@ -166,7 +166,7 @@ class _RegisterMobileState extends State<RegisterMobile> {
                         final UserProvider userProvider =
                             Provider.of<UserProvider>(context, listen: false);
                         try {
-                          await userProvider.registerUserWithEmailAndPassword(
+                          await userProvider.registerUserWithEmail(
                             _emailController.text.trim(),
                             _passwordController.text,
                           );
