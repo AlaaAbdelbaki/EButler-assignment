@@ -1,18 +1,23 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:ebutler/classes/locations.class.dart';
 import 'package:ebutler/interfaces/user.interface.dart';
 import 'package:ebutler/models/user.model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:intl_phone_field/phone_number.dart';
 
 class UserServices implements IUserServices {
   final FirebaseAuth _firebaseAuth;
   final FirebaseFirestore _firestore;
+  final FirebaseStorage _firebaseStorage;
 
   UserServices()
       : _firebaseAuth = FirebaseAuth.instance,
-        _firestore = FirebaseFirestore.instance;
+        _firestore = FirebaseFirestore.instance,
+        _firebaseStorage = FirebaseStorage.instance;
 
   /// Creates a new user in Firebase auth and saves their details in Firestore
   @override
@@ -69,17 +74,14 @@ class UserServices implements IUserServices {
   @override
   Future<UserModel> getUserDetails() async {
     try {
-      final Map<String, dynamic> userJson = (await _firestore
+      final Map<String, dynamic>? userJson = (await _firestore
               .collection('users')
-              .limit(1)
-              .where(
-                'uid',
-                isEqualTo: _firebaseAuth.currentUser!.uid,
-              )
+              .doc('${_firebaseAuth.currentUser?.uid}')
               .get())
-          .docs
-          .first
           .data();
+      if (userJson == null) {
+        return Future.error('Could not find user details');
+      }
       final UserModel userModel = UserModel.fromMap(userJson);
       return userModel;
     } catch (e, stackTrace) {
@@ -96,17 +98,10 @@ class UserServices implements IUserServices {
     Role role,
   ) async {
     try {
-      QueryDocumentSnapshot document = (await _firestore
-              .collection('users')
-              .limit(1)
-              .where(
-                'uid',
-                isEqualTo: _firebaseAuth.currentUser!.uid,
-              )
-              .get())
-          .docs
-          .first;
-      await _firestore.collection('users').doc(document.id).update({
+      await _firestore
+          .collection('users')
+          .doc('${_firebaseAuth.currentUser?.uid}')
+          .update({
         'name': name,
         'phoneNumber': {
           'countryCode': phoneNumber.countryCode,
@@ -123,6 +118,70 @@ class UserServices implements IUserServices {
         stackTrace: stackTrace,
       );
       return Future.error(e);
+    }
+  }
+
+  /// Logs the user out of the application
+  @override
+  Future<void> logout() async {
+    await _firebaseAuth.signOut();
+  }
+
+  /// Uploads a photo to the firebase storage
+  @override
+  Future<void> uploadProfilePicture(String path) async {
+    try {
+      // creates a storage reference
+      final Reference storageReference =
+          _firebaseStorage.ref().child(_firebaseAuth.currentUser!.uid);
+      // sets the file name
+      storageReference.child(path.split('/').last);
+      // create a file from the path
+      final File profilePicture = File(
+        path,
+      );
+      // upload the file
+      await storageReference.putFile(
+        profilePicture,
+        SettableMetadata(
+          // Setting the file extension
+          contentType: "image/${path.split('.').last}",
+        ),
+      );
+      // get the download url after uploading
+      final String downloadUrl = await storageReference.getDownloadURL();
+      // saving the profile picture url to the Firebase auth user instance
+      _firebaseAuth.currentUser!.updatePhotoURL(downloadUrl);
+    } on FirebaseException catch (e, stackTrace) {
+      log('Error uploading image', error: e, stackTrace: stackTrace);
+      return Future.error((e).message!);
+    } catch (e, stackTrace) {
+      log('Error uploading image', error: e, stackTrace: stackTrace);
+      return Future.error('Error uploading image');
+    }
+  }
+
+  /// Adds a [position] to the user's saved positions
+  @override
+  Future<void> addPosition(Location location) async {
+    try {
+      await _firestore
+          .collection('users')
+          .doc('${_firebaseAuth.currentUser?.uid}')
+          .update(
+        {
+          'locations': FieldValue.arrayUnion(
+            [
+              location.toMap(),
+            ],
+          )
+        },
+      );
+    } on FirebaseException catch (e, stackTrace) {
+      log('Error adding new position', error: e, stackTrace: stackTrace);
+      return Future.error(e.message!);
+    } catch (e, stackTrace) {
+      log('Error adding new position', error: e, stackTrace: stackTrace);
     }
   }
 }
