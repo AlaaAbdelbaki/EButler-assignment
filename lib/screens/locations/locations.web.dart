@@ -32,7 +32,7 @@ class _LocationsWebState extends State<LocationsWeb> {
 
   @override
   Widget build(BuildContext context) {
-    final UserModel loggedInUser = context.watch<UserProvider>().user;
+    final UserModel? loggedInUser = context.watch<UserProvider>().user;
 
     return FutureBuilder<Position>(
       future: _getLocationFuture,
@@ -168,7 +168,7 @@ class _LocationsWebState extends State<LocationsWeb> {
                   urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                 ),
                 MarkerLayer(
-                  markers: (loggedInUser.positions ?? [])
+                  markers: (loggedInUser?.positions ?? [])
                       .map(
                         (location) => Marker(
                           point: location.coordinates,

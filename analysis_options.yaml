@@ -25,7 +25,6 @@ linter:
     prefer_single_quotes: true
     avoid_empty_else: true
     avoid_unnecessary_containers: true
-    unnecessary_await_in_return: true
     prefer_interpolation_to_compose_strings: true
     require_trailing_commas: true
 

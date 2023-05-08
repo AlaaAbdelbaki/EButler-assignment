@@ -33,7 +33,7 @@ class _LocationsMobileState extends State<LocationsMobile> {
 
   @override
   Widget build(BuildContext context) {
-    final UserModel loggedInUser = context.watch<UserProvider>().user;
+    final UserModel? loggedInUser = context.watch<UserProvider>().user;
     return FutureBuilder(
       future: _getLocationFuture,
       builder: (context, snapshot) => snapshot.connectionState !=
@@ -156,7 +156,7 @@ class _LocationsMobileState extends State<LocationsMobile> {
                   urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                 ),
                 MarkerLayer(
-                  markers: (loggedInUser.positions ?? [])
+                  markers: (loggedInUser?.positions ?? [])
                       .map(
                         (location) => Marker(
                           anchorPos: AnchorPos.exactly(Anchor(0, 0)),
