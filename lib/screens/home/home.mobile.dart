@@ -46,6 +46,43 @@ class _HomeMobileState extends State<HomeMobile> {
               : 'Welome back ${loggedInUser?.name}',
           style: const TextStyle(color: Colors.black),
         ),
+        actions: loggedInUser?.role == Role.OPERATOR
+            ? null
+            : [
+                IconButton(
+                  onPressed: () async {
+                    final List<UserModel> operators =
+                        await Provider.of<UserProvider>(context, listen: false)
+                            .getAllByRole(Role.OPERATOR);
+                    if (!mounted) return;
+                    showDialog(
+                      context: context,
+                      builder: (contetx) => AlertDialog(
+                        title: const Text(
+                          'Choose an operator',
+                        ),
+                        content: DropdownButtonFormField<UserModel>(
+                          onChanged: (value) {
+                            context.pop();
+                            context.push('/conversation/${value?.uid}');
+                          },
+                          items: operators
+                              .map(
+                                (e) => DropdownMenuItem<UserModel>(
+                                  value: e,
+                                  child: Text(e.name!),
+                                ),
+                              )
+                              .toList(),
+                        ),
+                      ),
+                    );
+                  },
+                  icon: const HeroIcon(
+                    HeroIcons.pencilSquare,
+                  ),
+                )
+              ],
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: currentIndex,
