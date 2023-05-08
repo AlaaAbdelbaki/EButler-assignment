@@ -19,4 +19,6 @@ abstract class IUserServices {
   Future<void> uploadProfilePicture(String path);
 
   Future<void> addPosition(Location location);
+
+  Future<List<UserModel>> getAllByRole(Role role);
 }

@@ -10,7 +10,7 @@ import 'package:intl_phone_field/phone_number.dart';
 class UserProvider extends ChangeNotifier implements IUserServices {
   UserModel? _user;
 
-  UserModel get user => _user!;
+  UserModel? get user => _user;
 
   void setUser(UserModel user) {
     _user = user;
@@ -88,11 +88,23 @@ class UserProvider extends ChangeNotifier implements IUserServices {
     notifyListeners();
   }
 
+  /// Adds a position to a customer's favourites locations
   @override
   Future<void> addPosition(Location location) async {
     try {
       await UserServices().addPosition(location);
       await getUserDetails();
+    } catch (e) {
+      return Future.error(e);
+    }
+  }
+
+  /// Fetches the list of all users who have the OPERATOR [Role]
+  @override
+  Future<List<UserModel>> getAllByRole(Role role) async {
+    try {
+      final List<UserModel> operators = await UserServices().getAllByRole(role);
+      return operators;
     } catch (e) {
       return Future.error(e);
     }

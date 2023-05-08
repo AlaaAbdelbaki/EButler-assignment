@@ -152,6 +152,10 @@ class UserServices implements IUserServices {
       final String downloadUrl = await storageReference.getDownloadURL();
       // saving the profile picture url to the Firebase auth user instance
       _firebaseAuth.currentUser!.updatePhotoURL(downloadUrl);
+      await _firestore
+          .collection('users')
+          .doc(_firebaseAuth.currentUser!.uid)
+          .update({'image': downloadUrl});
     } on FirebaseException catch (e, stackTrace) {
       log('Error uploading image', error: e, stackTrace: stackTrace);
       return Future.error((e).message!);
@@ -182,6 +186,38 @@ class UserServices implements IUserServices {
       return Future.error(e.message!);
     } catch (e, stackTrace) {
       log('Error adding new position', error: e, stackTrace: stackTrace);
+    }
+  }
+
+  /// Fetches all users who have the OPERATOR [Role]
+  @override
+  Future<List<UserModel>> getAllByRole(Role role) async {
+    try {
+      final usersJson = (await _firestore
+              .collection('users')
+              .where(
+                'role',
+                isEqualTo: role.name,
+              )
+              .get())
+          .docs;
+      List<UserModel> users = [];
+      for (var userJson in usersJson) {
+        final UserModel user = UserModel.fromMap(userJson.data());
+        if (!users.contains(user) &&
+            user.uid != _firebaseAuth.currentUser!.uid) {
+          users.add(user);
+        }
+      }
+      return users;
+    } on FirebaseException catch (e, stackTrace) {
+      log('Error fetching users', error: e, stackTrace: stackTrace);
+      return Future.error(e.message!);
+    } catch (e, stackTrace) {
+      log('Error fetching users', error: e, stackTrace: stackTrace);
+      return Future.error(
+        'Error fetching users',
+      );
     }
   }
 }
