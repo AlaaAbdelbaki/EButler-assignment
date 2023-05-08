@@ -32,10 +32,11 @@ class _HomeWebState extends State<HomeWeb> {
   @override
   Widget build(BuildContext context) {
     final User? user = FirebaseAuth.instance.currentUser;
-    final UserModel loggedInUser = context.watch<UserProvider>().user;
+    final UserModel? loggedInUser = context.watch<UserProvider>().user;
     final int currentIndex = context.watch<SystemProvider>().currentIndex;
     return Scaffold(
-      floatingActionButton: currentIndex == 0
+      floatingActionButton: currentIndex == 0 ||
+              loggedInUser!.role == Role.OPERATOR
           ? null
           : FloatingActionButton(
               child: const HeroIcon(
@@ -126,6 +127,7 @@ class _HomeWebState extends State<HomeWeb> {
                                               if (!mounted) return;
                                               context.pop();
                                             } catch (e) {
+                                              if (!mounted) return;
                                               showDialog(
                                                 context: context,
                                                 builder: (context) => Alert(
@@ -153,6 +155,7 @@ class _HomeWebState extends State<HomeWeb> {
             ),
       body: Stack(
         children: [
+          // Main page content
           Align(
             alignment: Alignment.centerRight,
             child: SizedBox(
@@ -161,6 +164,7 @@ class _HomeWebState extends State<HomeWeb> {
               child: widget.child,
             ),
           ),
+          // Sode nav bar
           SizedBox(
             width: 300,
             child: Material(
@@ -187,42 +191,33 @@ class _HomeWebState extends State<HomeWeb> {
                               backgroundImage: const AssetImage(
                                 'assets/images/profile.jpeg',
                               ),
-                              foregroundImage: user == null
-                                  ? null
-                                  : NetworkImage('${user.photoURL}'),
+                              foregroundImage:
+                                  user == null || user.photoURL == null
+                                      ? null
+                                      : NetworkImage('${user.photoURL}'),
                               radius: 20,
                             ),
                             title: Text('Welcome back ${user?.displayName}'),
                           ),
                         ),
-                        loggedInUser.role == Role.CUSTOMER
-                            ? ListTile(
-                                leading: const HeroIcon(
-                                  HeroIcons.chatBubbleLeftRight,
-                                ),
-                                title: const Text('Chat with us'),
-                                onTap: () {
-                                  Provider.of<SystemProvider>(
-                                    context,
-                                    listen: false,
-                                  ).setIndex(0);
-                                  context.go('/chat');
-                                },
-                              )
-                            : ListTile(
-                                leading: const HeroIcon(
-                                  HeroIcons.chatBubbleLeftRight,
-                                ),
-                                title: const Text('Inbox'),
-                                onTap: () {
-                                  Provider.of<SystemProvider>(
-                                    context,
-                                    listen: false,
-                                  ).setIndex(0);
-                                  context.go('/chat');
-                                },
-                              ),
-                        loggedInUser.role == Role.CUSTOMER
+                        ListTile(
+                          leading: const HeroIcon(
+                            HeroIcons.chatBubbleLeftRight,
+                          ),
+                          title: Text(
+                            loggedInUser?.role == Role.CUSTOMER
+                                ? 'Chat with us'
+                                : 'Inbox',
+                          ),
+                          onTap: () {
+                            Provider.of<SystemProvider>(
+                              context,
+                              listen: false,
+                            ).setIndex(0);
+                            context.go('/chat');
+                          },
+                        ),
+                        loggedInUser?.role == Role.CUSTOMER
                             ? ListTile(
                                 leading: const HeroIcon(HeroIcons.mapPin),
                                 title: const Text('Locations'),

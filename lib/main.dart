@@ -1,27 +1,26 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'dart:developer';
+
 import 'package:ebutler/firebase_options.dart';
 import 'package:ebutler/providers/system.provider.dart';
 import 'package:ebutler/providers/user.provider.dart';
 import 'package:ebutler/routes/routes.dart';
 import 'package:ebutler/utils/utils.dart';
 import 'package:ebutler/utils/constants.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:url_strategy/url_strategy.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   // Use emulators if running in debug mode
-  if (!kReleaseMode) {
-    FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080);
-    await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
-    await FirebaseStorage.instance.useStorageEmulator('localhost', 9199);
-  }
+  // if (!kReleaseMode) {
+  //   FirebaseFirestore.instance.useFirestoreEmulator('localhost', 8080);
+  //   await FirebaseAuth.instance.useAuthEmulator('localhost', 9099);
+  //   await FirebaseStorage.instance.useStorageEmulator('localhost', 9199);
+  // }
 
   setPathUrlStrategy();
   runApp(
@@ -77,6 +76,15 @@ class MyApp extends StatelessWidget {
             ),
           ),
         ),
+        builder: (context, child) {
+          return StreamChat(
+            client: context.watch<SystemProvider>().client,
+            child: child,
+            onBackgroundEventReceived: (event) {
+              log(event.type);
+            },
+          );
+        },
         routerConfig: router,
       ),
     );

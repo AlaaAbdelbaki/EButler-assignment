@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:ebutler/classes/locations.class.dart';
 import 'package:ebutler/models/user.model.dart';
 import 'package:ebutler/providers/system.provider.dart';
@@ -32,7 +30,7 @@ class _HomeMobileState extends State<HomeMobile> {
   @override
   Widget build(BuildContext context) {
     int currentIndex = context.watch<SystemProvider>().currentIndex;
-    final UserModel loggedInUser = context.watch<UserProvider>().user;
+    final UserModel? loggedInUser = context.watch<UserProvider>().user;
     return Scaffold(
       drawer: const HomeDrawer(),
       appBar: AppBar(
@@ -42,20 +40,20 @@ class _HomeMobileState extends State<HomeMobile> {
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         title: Text(
           currentIndex == 1
-              ? 'My locations'
-              : 'Welome back ${loggedInUser.name}',
+              ? loggedInUser?.role == Role.CUSTOMER
+                  ? 'My locations'
+                  : 'Saloon'
+              : 'Welome back ${loggedInUser?.name}',
           style: const TextStyle(color: Colors.black),
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: currentIndex,
         onTap: (index) {
-          log('$index');
           Provider.of<SystemProvider>(context, listen: false).setIndex(index);
-          log('$currentIndex');
           context.go(index == 0 ? '/chat' : '/locations');
         },
-        items: loggedInUser.role == Role.CUSTOMER
+        items: loggedInUser?.role == Role.CUSTOMER
             ? [
                 const BottomNavigationBarItem(
                   icon: HeroIcon(
@@ -85,7 +83,8 @@ class _HomeMobileState extends State<HomeMobile> {
                 ),
               ],
       ),
-      floatingActionButton: currentIndex == 0
+      floatingActionButton: currentIndex == 0 ||
+              loggedInUser?.role != Role.CUSTOMER
           ? null
           : FloatingActionButton(
               onPressed: () async {
