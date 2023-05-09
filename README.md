@@ -15,8 +15,9 @@ In order to test the chat functionnality, access tokens had to be hard coded int
 
 ## Checklist
 
+- [x] Web and mobile responsive UI
 - [x] Sign in
 - [x] Sign up
-- [x] Real time chat
+- [x] Real time chat with GetStream
 - [x] Real time notifications sound when receiving a new message
 - [x] Maps and location services
