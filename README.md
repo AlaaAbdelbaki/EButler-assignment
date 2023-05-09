@@ -21,3 +21,9 @@ In order to test the chat functionnality, access tokens had to be hard coded int
 - [x] Real time chat with GetStream
 - [x] Real time notifications sound when receiving a new message
 - [x] Maps and location services
+
+## How to run
+
+1. Check you're in the root of the project
+2. Make sure you have one of these devices connected to your computer (Android device / iOS device / Google Chrome browser)
+3. run `flutter run`
