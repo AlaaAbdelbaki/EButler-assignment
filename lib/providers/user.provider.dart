@@ -1,11 +1,10 @@
 import 'dart:async';
-import 'dart:html' as html;
 
 import 'package:ebutler/classes/locations.class.dart';
 import 'package:ebutler/interfaces/user.interface.dart';
 import 'package:ebutler/models/user.model.dart';
 import 'package:ebutler/services/user.services.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:intl_phone_field/phone_number.dart';
 
 class UserProvider extends ChangeNotifier implements IUserServices {
@@ -83,7 +82,7 @@ class UserProvider extends ChangeNotifier implements IUserServices {
 
   /// Uploads a profile picture to the storage using the provided [path]
   @override
-  Future<void> uploadProfilePictureWeb(html.File file) async {
+  Future<void> uploadProfilePictureWeb(Uint8List file) async {
     try {
       await UserServices().uploadProfilePictureWeb(file);
     } catch (e) {

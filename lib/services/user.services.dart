@@ -1,6 +1,5 @@
 import 'dart:developer';
 import 'dart:io';
-import 'dart:html' as html;
 import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -168,24 +167,20 @@ class UserServices implements IUserServices {
 
   /// Same as [uploadProfilePicture] but for Web
   @override
-  Future<void> uploadProfilePictureWeb(html.File file) async {
+  Future<void> uploadProfilePictureWeb(Uint8List file) async {
     try {
       // creates a storage reference
       final Reference storageReference = _firebaseStorage.ref().child(
-            '${_firebaseAuth.currentUser?.uid}/profilePicture.${file.name.split('.').last}',
+            '${_firebaseAuth.currentUser?.uid}/profilePicture.png',
           );
 
       // create a buffer from the file
-      final reader = html.FileReader();
-      reader.readAsArrayBuffer(file);
-      await reader.onLoad.first;
-      final data = reader.result as Uint8List;
       // upload the file
       await storageReference.putData(
-        data,
+        file,
         SettableMetadata(
           // Setting the file extension
-          contentType: "image/${file.name.split('.').last}",
+          contentType: 'image/png',
         ),
       );
       // get the download url after uploading

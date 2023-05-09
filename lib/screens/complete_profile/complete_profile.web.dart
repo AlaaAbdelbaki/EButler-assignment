@@ -1,5 +1,4 @@
 import 'dart:developer';
-import 'dart:html' as html;
 
 import 'package:ebutler/models/user.model.dart';
 import 'package:ebutler/providers/user.provider.dart';
@@ -7,11 +6,11 @@ import 'package:ebutler/utils/constants.dart';
 import 'package:ebutler/utils/extensions.dart';
 import 'package:ebutler/widgets/alert.dart';
 import 'package:ebutler/widgets/async_button.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:heroicons/heroicons.dart';
-import 'package:image_picker_web/image_picker_web.dart';
 import 'package:intl_phone_field/country_picker_dialog.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:intl_phone_field/phone_number.dart';
@@ -236,10 +235,12 @@ class _CompleteProfileWebState extends State<CompleteProfileWeb> {
   Future<void> uploadImage() async {
     final UserProvider userProvider =
         Provider.of<UserProvider>(context, listen: false);
-    final html.File? pickedFile = await ImagePickerWeb.getImageAsFile();
+    final FilePickerResult? pickedFile = await FilePicker.platform.pickFiles(
+      allowMultiple: false,
+    );
     if (pickedFile == null) return;
     try {
-      await userProvider.uploadProfilePictureWeb(pickedFile);
+      await userProvider.uploadProfilePicture(pickedFile.files.first.path!);
       await FirebaseAuth.instance.currentUser!.reload();
     } catch (e) {
       log('$e');

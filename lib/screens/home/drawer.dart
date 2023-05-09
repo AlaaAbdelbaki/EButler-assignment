@@ -3,7 +3,6 @@ import 'package:ebutler/providers/system.provider.dart';
 import 'package:ebutler/providers/user.provider.dart';
 import 'package:ebutler/utils/constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:heroicons/heroicons.dart';
 import 'package:provider/provider.dart';

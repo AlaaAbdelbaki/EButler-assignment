@@ -1,7 +1,6 @@
-import 'dart:html' as html;
-
 import 'package:ebutler/classes/locations.class.dart';
 import 'package:ebutler/models/user.model.dart';
+import 'package:flutter/foundation.dart';
 import 'package:intl_phone_field/phone_number.dart';
 
 abstract class IUserServices {
@@ -21,7 +20,7 @@ abstract class IUserServices {
   Future<void> uploadProfilePicture(String path);
 
   Future<void> uploadProfilePictureWeb(
-    html.File file,
+    Uint8List file,
   );
 
   Future<void> addPosition(Location location);

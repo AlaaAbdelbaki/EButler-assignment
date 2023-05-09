@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:ebutler/firebase_options.dart';
 import 'package:ebutler/providers/system.provider.dart';
 import 'package:ebutler/providers/user.provider.dart';
@@ -8,6 +6,7 @@ import 'package:ebutler/utils/utils.dart';
 import 'package:ebutler/utils/constants.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import 'package:provider/provider.dart';
 import 'package:stream_chat_flutter/stream_chat_flutter.dart';
 import 'package:url_strategy/url_strategy.dart';
@@ -81,7 +80,10 @@ class MyApp extends StatelessWidget {
             client: context.watch<SystemProvider>().client,
             child: child,
             onBackgroundEventReceived: (event) {
-              log(event.type);
+              if (event.type == 'message.new') {
+                // Plays a sound when receiving a new message
+                FlutterRingtonePlayer.playNotification();
+              }
             },
           );
         },
