@@ -11,12 +11,16 @@ const double radius = 12.0;
 
 // Tokens are hardcoded since a backend that generates these tokens is not available
 const Map<String, String> tokens = {
-  'tZVVI6qzimR5t0tFD0SSwAOIbqs1':
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoidFpWVkk2cXppbVI1dDB0RkQwU1N3QU9JYnFzMSJ9.QsInw-RY5I8fd-VOaImDxK3G0at5tLFUJ_fQgIUpBbY',
-  '6ZbjU1j7NvP9KlZD0uNsdm2IuKk2':
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNlpialUxajdOdlA5S2xaRDB1TnNkbTJJdUtrMiJ9.pK7grF28KqIfUrMy9ZeqAMNvjf6uNEJ-uiHWQgA8U6w',
-  'gJ7OjYW5WEaurjMEB3eL2raasC02':
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiZ0o3T2pZVzVXRWF1cmpNRUIzZUwycmFhc0MwMiJ9.2M_yc6XMKcRDUyl6Z_rrZEa1mMXiYn8fHo1XwY-aB4c',
-  'ZcknwJXsq5VfsKyGFGAhnUmkvIE2':
-      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiWmNrbndKWHNxNVZmc0t5R0ZHQWhuVW1rdklFMiJ9.v0SlH6cSWUNE7_f94H3tLUKOqrpN9Z0bdkcrS6B-R_U'
+  // Charlotte
+  'BxeyNlJNMrMw1x4RjVgJav9nZpt1':
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiQnhleU5sSk5Nck13MXg0UmpWZ0phdjluWnB0MSJ9.gweVI_e_YNxnUtIHPljS24fRxZ0uY_M4sz9LP_aQIgk',
+  //Jack
+  '734uYef1KMbnTKagYCM6SUdmWxC2':
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiNzM0dVllZjFLTWJuVEthZ1lDTTZTVWRtV3hDMiJ9.sQxnDzzU0UZsb1k9MJTceewCZCzc8h2LbG8WglGKMNM',
+  // Mohamed
+  'PjGmz16tpCPVQFMMpRagXvIQY9b2':
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiUGpHbXoxNnRwQ1BWUUZNTXBSYWdYdklRWTliMiJ9.uTtBmm4JaKCq-dmV9TFJ2FES0HOP2Fom0w3T6AcEvHU',
+  // Marie
+  '1uFvwo5EqgdGsKkFyu9DpclNnrB2':
+      'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoiMXVGdndvNUVxZ2RHc0trRnl1OURwY2xObnJCMiJ9.shJ1TMBZHn9ECPgRMnmMwmuS0Ka-KWHh6_ZnYKD29Nc'
 };

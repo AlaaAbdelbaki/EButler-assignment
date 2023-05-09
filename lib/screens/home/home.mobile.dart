@@ -46,7 +46,8 @@ class _HomeMobileState extends State<HomeMobile> {
               : 'Welome back ${loggedInUser?.name}',
           style: const TextStyle(color: Colors.black),
         ),
-        actions: loggedInUser?.role == Role.OPERATOR
+        actions: loggedInUser?.role == Role.OPERATOR ||
+                loggedInUser?.operatorUid != null
             ? null
             : [
                 IconButton(

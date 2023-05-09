@@ -2,6 +2,8 @@ import 'package:ebutler/models/user.model.dart';
 import 'package:ebutler/providers/system.provider.dart';
 import 'package:ebutler/providers/user.provider.dart';
 import 'package:ebutler/utils/constants.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:heroicons/heroicons.dart';
 import 'package:provider/provider.dart';
@@ -38,7 +40,9 @@ class HomeDrawer extends StatelessWidget {
                       ),
                       foregroundImage: user == null || user.image == null
                           ? null
-                          : NetworkImage('${user.image}'),
+                          : NetworkImage(
+                              '${FirebaseAuth.instance.currentUser?.photoURL}',
+                            ),
                       radius: 20,
                     ),
                     title: Text('Welcome back ${user?.name}'),

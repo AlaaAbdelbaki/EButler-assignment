@@ -13,6 +13,7 @@ class InboxWeb extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamChannelListView(
+      padding: const EdgeInsets.all(20),
       controller: StreamChannelListController(
         client: client,
         filter: Filter.in_(

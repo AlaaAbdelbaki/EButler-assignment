@@ -19,6 +19,7 @@ class UserModel {
   String? image;
   final Role? role;
   final List<Location>? positions;
+  final String? operatorUid;
   UserModel({
     required this.uid,
     required this.email,
@@ -26,6 +27,7 @@ class UserModel {
     this.phoneNumber,
     this.role,
     this.positions,
+    this.operatorUid,
   });
 
   UserModel copyWith({
@@ -35,6 +37,7 @@ class UserModel {
     PhoneNumber? phoneNumber,
     Role? role,
     List<Location>? positions,
+    String? operatorUid,
   }) {
     return UserModel(
       uid: uid ?? this.uid,
@@ -43,6 +46,7 @@ class UserModel {
       phoneNumber: phoneNumber ?? this.phoneNumber,
       role: role ?? this.role,
       positions: positions ?? this.positions,
+      operatorUid: operatorUid ?? this.operatorUid,
     );
   }
 
@@ -61,7 +65,8 @@ class UserModel {
           ?.map(
             (e) => e.toMap(),
           )
-          .toList()
+          .toList(),
+      'operatorUid': operatorUid
     };
   }
 
@@ -91,6 +96,8 @@ class UserModel {
                 (e) => Location.fromMap(e),
               ),
             ),
+      operatorUid:
+          map['operatorUid'] == null ? null : map['operatorUid'] as String,
     );
   }
 
@@ -101,7 +108,7 @@ class UserModel {
 
   @override
   String toString() {
-    return 'UserModel(id: $uid, email: $email, name: $name, phoneNumber: $phoneNumber, role: ${role?.name}, positions: ${positions?.toString()})';
+    return 'UserModel(id: $uid, email: $email, name: $name, phoneNumber: $phoneNumber, role: ${role?.name}, positions: ${positions?.toString()}, operatorUid: $operatorUid)';
   }
 
   @override
@@ -113,7 +120,8 @@ class UserModel {
         other.name == name &&
         other.phoneNumber == phoneNumber &&
         other.role == role &&
-        other.positions == positions;
+        other.positions == positions &&
+        other.operatorUid == operatorUid;
   }
 
   @override
@@ -123,6 +131,7 @@ class UserModel {
         name.hashCode ^
         phoneNumber.hashCode ^
         role.hashCode ^
-        positions.hashCode;
+        positions.hashCode ^
+        operatorUid.hashCode;
   }
 }

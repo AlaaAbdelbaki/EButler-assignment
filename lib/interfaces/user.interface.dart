@@ -1,3 +1,5 @@
+import 'dart:html' as html;
+
 import 'package:ebutler/classes/locations.class.dart';
 import 'package:ebutler/models/user.model.dart';
 import 'package:intl_phone_field/phone_number.dart';
@@ -18,7 +20,15 @@ abstract class IUserServices {
 
   Future<void> uploadProfilePicture(String path);
 
+  Future<void> uploadProfilePictureWeb(
+    html.File file,
+  );
+
   Future<void> addPosition(Location location);
 
   Future<List<UserModel>> getAllByRole(Role role);
+
+  Future<void> setOperatorUid(String uid);
+
+  Future<List<Location>> getClientLocations(String uid);
 }

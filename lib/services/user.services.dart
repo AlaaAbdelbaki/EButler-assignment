@@ -1,5 +1,7 @@
 import 'dart:developer';
 import 'dart:io';
+import 'dart:html' as html;
+import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:ebutler/classes/locations.class.dart';
@@ -132,10 +134,9 @@ class UserServices implements IUserServices {
   Future<void> uploadProfilePicture(String path) async {
     try {
       // creates a storage reference
-      final Reference storageReference =
-          _firebaseStorage.ref().child(_firebaseAuth.currentUser!.uid);
-      // sets the file name
-      storageReference.child(path.split('/').last);
+      final Reference storageReference = _firebaseStorage.ref().child(
+            '${_firebaseAuth.currentUser?.uid}/profilePicture.${path.split('/').last}',
+          );
       // create a file from the path
       final File profilePicture = File(
         path,
@@ -160,6 +161,47 @@ class UserServices implements IUserServices {
       log('Error uploading image', error: e, stackTrace: stackTrace);
       return Future.error((e).message!);
     } catch (e, stackTrace) {
+      log('Error uploading image', error: e, stackTrace: stackTrace);
+      return Future.error('Error uploading image');
+    }
+  }
+
+  /// Same as [uploadProfilePicture] but for Web
+  @override
+  Future<void> uploadProfilePictureWeb(html.File file) async {
+    try {
+      // creates a storage reference
+      final Reference storageReference = _firebaseStorage.ref().child(
+            '${_firebaseAuth.currentUser?.uid}/profilePicture.${file.name.split('.').last}',
+          );
+
+      // create a buffer from the file
+      final reader = html.FileReader();
+      reader.readAsArrayBuffer(file);
+      await reader.onLoad.first;
+      final data = reader.result as Uint8List;
+      // upload the file
+      await storageReference.putData(
+        data,
+        SettableMetadata(
+          // Setting the file extension
+          contentType: "image/${file.name.split('.').last}",
+        ),
+      );
+      // get the download url after uploading
+      final String downloadUrl = await storageReference.getDownloadURL();
+      // saving the profile picture url to the Firebase auth user instance
+      _firebaseAuth.currentUser!.updatePhotoURL(downloadUrl);
+      await _firestore
+          .collection('users')
+          .doc(_firebaseAuth.currentUser!.uid)
+          .update({'image': downloadUrl});
+    } on FirebaseException catch (e, stackTrace) {
+      log('$e');
+      log('Error uploading image', error: e, stackTrace: stackTrace);
+      return Future.error((e).message!);
+    } catch (e, stackTrace) {
+      log('$e');
       log('Error uploading image', error: e, stackTrace: stackTrace);
       return Future.error('Error uploading image');
     }
@@ -218,6 +260,43 @@ class UserServices implements IUserServices {
       return Future.error(
         'Error fetching users',
       );
+    }
+  }
+
+  /// Saves the Operator's uid to the user model to link each user with a unique operator
+  @override
+  Future<void> setOperatorUid(String uid) async {
+    try {
+      await _firestore
+          .collection('users')
+          .doc(_firebaseAuth.currentUser!.uid)
+          .update(
+        {'operatorUid': uid},
+      );
+    } on FirebaseException catch (e) {
+      return Future.error(e.message!);
+    } catch (e) {
+      return Future.error('$e');
+    }
+  }
+
+  /// Fetches the list of the client's saved locations
+  @override
+  Future<List<Location>> getClientLocations(String uid) async {
+    try {
+      final userDoc = await _firestore.collection('users').doc(uid).get();
+      final userJson = userDoc.data();
+      if (userJson == null) {
+        return Future.error('User not found !');
+      }
+      final UserModel user = UserModel.fromMap(userJson);
+      return user.positions ?? [];
+    } on FirebaseException catch (e) {
+      log(
+        'Error fetching user locations',
+        error: e,
+      );
+      return Future.error(e.message!);
     }
   }
 }

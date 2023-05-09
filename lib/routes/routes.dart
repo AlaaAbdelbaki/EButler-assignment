@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:ebutler/models/user.model.dart';
 import 'package:ebutler/providers/user.provider.dart';
 import 'package:ebutler/screens/chat/chat.dart';
+import 'package:ebutler/screens/client_locations/client_locations.dart';
 import 'package:ebutler/screens/complete_profile/complete_profile.dart';
 import 'package:ebutler/screens/error/error_page.dart';
 import 'package:ebutler/screens/home/home.dart';
@@ -51,6 +52,21 @@ final GoRouter _router = GoRouter(
     return null;
   },
   routes: [
+    GoRoute(
+      parentNavigatorKey: _parentKey,
+      path: '/user-locations/:id',
+      redirect: (context, state) {
+        final UserModel loggedInUser = context.read<UserProvider>().user!;
+        if (loggedInUser.role == Role.CUSTOMER) {
+          return '/chat';
+        }
+        return null;
+      },
+      builder: (context, state) {
+        final String userId = state.pathParameters['id']!;
+        return ClientLocations(userId: userId);
+      },
+    ),
     GoRoute(
       parentNavigatorKey: _parentKey,
       path: '/conversation/:id',

@@ -1,12 +1,17 @@
+import 'dart:developer';
+import 'dart:html' as html;
+
 import 'package:ebutler/models/user.model.dart';
 import 'package:ebutler/providers/user.provider.dart';
 import 'package:ebutler/utils/constants.dart';
 import 'package:ebutler/utils/extensions.dart';
 import 'package:ebutler/widgets/alert.dart';
 import 'package:ebutler/widgets/async_button.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:heroicons/heroicons.dart';
+import 'package:image_picker_web/image_picker_web.dart';
 import 'package:intl_phone_field/country_picker_dialog.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:intl_phone_field/phone_number.dart';
@@ -25,6 +30,8 @@ class _CompleteProfileWebState extends State<CompleteProfileWeb> {
   final TextEditingController _nameController = TextEditingController();
   PhoneNumber? _selectedPhoneNumber;
   Role? _selectedRole;
+
+  ValueKey imageKey = const ValueKey('image');
 
   @override
   void dispose() {
@@ -47,7 +54,6 @@ class _CompleteProfileWebState extends State<CompleteProfileWeb> {
               borderRadius: BorderRadius.circular(radius),
               clipBehavior: Clip.hardEdge,
               child: Container(
-                height: 700,
                 width: 800,
                 padding: const EdgeInsets.all(50),
                 child: Form(
@@ -69,6 +75,30 @@ class _CompleteProfileWebState extends State<CompleteProfileWeb> {
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 60,
+                              ),
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 20),
+                            child: GestureDetector(
+                              onTap: () async {
+                                await uploadImage();
+                              },
+                              child: Center(
+                                child: CircleAvatar(
+                                  key: imageKey,
+                                  backgroundImage: const AssetImage(
+                                    'assets/images/profile.jpeg',
+                                  ),
+                                  radius: 60,
+                                  foregroundImage: FirebaseAuth
+                                              .instance.currentUser!.photoURL ==
+                                          null
+                                      ? null
+                                      : NetworkImage(
+                                          '${FirebaseAuth.instance.currentUser?.photoURL}',
+                                        ),
+                                ),
                               ),
                             ),
                           ),
@@ -201,5 +231,21 @@ class _CompleteProfileWebState extends State<CompleteProfileWeb> {
         ],
       ),
     );
+  }
+
+  Future<void> uploadImage() async {
+    final UserProvider userProvider =
+        Provider.of<UserProvider>(context, listen: false);
+    final html.File? pickedFile = await ImagePickerWeb.getImageAsFile();
+    if (pickedFile == null) return;
+    try {
+      await userProvider.uploadProfilePictureWeb(pickedFile);
+      await FirebaseAuth.instance.currentUser!.reload();
+    } catch (e) {
+      log('$e');
+    }
+    setState(() {
+      imageKey = ValueKey('${DateTime.now().millisecondsSinceEpoch}');
+    });
   }
 }

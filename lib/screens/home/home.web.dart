@@ -34,124 +34,165 @@ class _HomeWebState extends State<HomeWeb> {
     final User? user = FirebaseAuth.instance.currentUser;
     final UserModel? loggedInUser = context.watch<UserProvider>().user;
     final int currentIndex = context.watch<SystemProvider>().currentIndex;
+
     return Scaffold(
-      floatingActionButton: currentIndex == 0 ||
-              loggedInUser!.role == Role.OPERATOR
+      floatingActionButton: loggedInUser?.role == Role.OPERATOR ||
+              loggedInUser?.operatorUid != null
           ? null
           : FloatingActionButton(
-              child: const HeroIcon(
-                HeroIcons.mapPin,
-                style: HeroIconStyle.solid,
-              ),
-              onPressed: () async {
-                showDialog(
-                  context: context,
-                  builder: (context) => StatefulBuilder(
-                    builder: (context, setState) {
-                      final UserProvider userProvider =
-                          Provider.of<UserProvider>(
+              onPressed: currentIndex == 0
+                  ? () async {
+                      final List<UserModel> operators =
+                          await Provider.of<UserProvider>(
                         context,
                         listen: false,
-                      );
-                      {
-                        final GlobalKey<FormState> formKey =
-                            GlobalKey<FormState>();
-                        final TextEditingController titleController =
-                            TextEditingController();
-                        return Dialog(
-                          child: SizedBox(
-                            width: 600,
-                            child: Form(
-                              key: formKey,
-                              child: Padding(
-                                padding: const EdgeInsets.all(20),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    const Padding(
-                                      padding: EdgeInsets.only(
-                                        bottom: 20,
-                                      ),
-                                      child: Text(
-                                        'Add a title to your location',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.w600,
-                                          fontSize: 18,
-                                        ),
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        vertical: 10,
-                                      ),
-                                      child: TextFormField(
-                                        controller: titleController,
-                                        validator: (value) {
-                                          if (value == null || value.isEmpty) {
-                                            return 'Title cannot be empty';
-                                          }
-                                          return null;
-                                        },
-                                        decoration: const InputDecoration(
-                                          hintText: 'Add a title',
-                                          prefixIcon: HeroIcon(
-                                            HeroIcons.mapPin,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        vertical: 10,
-                                      ),
-                                      child: AsyncButton(
-                                        text: 'Add location',
-                                        onPressed: () async {
-                                          if (formKey.currentState!
-                                              .validate()) {
-                                            final Position currentPosition =
-                                                await determinePosition();
-                                            final Location location = Location(
-                                              title:
-                                                  titleController.text.trim(),
-                                              coordinates: LatLng(
-                                                currentPosition.latitude,
-                                                currentPosition.longitude,
-                                              ),
-                                            );
-                                            try {
-                                              await userProvider
-                                                  .addPosition(location);
-                                              if (!mounted) return;
-                                              context.pop();
-                                            } catch (e) {
-                                              if (!mounted) return;
-                                              showDialog(
-                                                context: context,
-                                                builder: (context) => Alert(
-                                                  title:
-                                                      'Error adding position',
-                                                  content: '$e',
-                                                ),
-                                              );
-                                            }
-                                          }
-                                        },
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              ),
-                            ),
+                      ).getAllByRole(Role.OPERATOR);
+                      if (!mounted) return;
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          title: const Text('Contact an operator'),
+                          content: DropdownButtonFormField<UserModel>(
+                            items: operators
+                                .map(
+                                  (e) => DropdownMenuItem<UserModel>(
+                                    value: e,
+                                    child: Text('${e.name}'),
+                                  ),
+                                )
+                                .toList(),
+                            onChanged: (operator) async {
+                              await Provider.of<UserProvider>(
+                                context,
+                                listen: false,
+                              ).setOperatorUid(operator!.uid);
+                              if (!mounted) return;
+                              context.pop();
+                              context.push('/conversation/${operator.uid}');
+                            },
                           ),
-                        );
-                      }
+                        ),
+                      );
+                    }
+                  : () async {
+                      showDialog(
+                        context: context,
+                        builder: (context) => StatefulBuilder(
+                          builder: (context, setState) {
+                            final UserProvider userProvider =
+                                Provider.of<UserProvider>(
+                              context,
+                              listen: false,
+                            );
+                            {
+                              final GlobalKey<FormState> formKey =
+                                  GlobalKey<FormState>();
+                              final TextEditingController titleController =
+                                  TextEditingController();
+                              return Dialog(
+                                child: SizedBox(
+                                  width: 600,
+                                  child: Form(
+                                    key: formKey,
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(20),
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          const Padding(
+                                            padding: EdgeInsets.only(
+                                              bottom: 20,
+                                            ),
+                                            child: Text(
+                                              'Add a title to your location',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 18,
+                                              ),
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                              vertical: 10,
+                                            ),
+                                            child: TextFormField(
+                                              controller: titleController,
+                                              validator: (value) {
+                                                if (value == null ||
+                                                    value.isEmpty) {
+                                                  return 'Title cannot be empty';
+                                                }
+                                                return null;
+                                              },
+                                              decoration: const InputDecoration(
+                                                hintText: 'Add a title',
+                                                prefixIcon: HeroIcon(
+                                                  HeroIcons.mapPin,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                              vertical: 10,
+                                            ),
+                                            child: AsyncButton(
+                                              text: 'Add location',
+                                              onPressed: () async {
+                                                if (formKey.currentState!
+                                                    .validate()) {
+                                                  final Position
+                                                      currentPosition =
+                                                      await determinePosition();
+                                                  final Location location =
+                                                      Location(
+                                                    title: titleController.text
+                                                        .trim(),
+                                                    coordinates: LatLng(
+                                                      currentPosition.latitude,
+                                                      currentPosition.longitude,
+                                                    ),
+                                                  );
+                                                  try {
+                                                    await userProvider
+                                                        .addPosition(location);
+                                                    if (!mounted) return;
+                                                    context.pop();
+                                                  } catch (e) {
+                                                    if (!mounted) return;
+                                                    showDialog(
+                                                      context: context,
+                                                      builder: (context) =>
+                                                          Alert(
+                                                        title:
+                                                            'Error adding position',
+                                                        content: '$e',
+                                                      ),
+                                                    );
+                                                  }
+                                                }
+                                              },
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }
+                          },
+                        ),
+                      );
                     },
-                  ),
-                );
-              },
+              child: HeroIcon(
+                currentIndex == 0 ? HeroIcons.pencilSquare : HeroIcons.mapPin,
+                style: HeroIconStyle.solid,
+              ),
             ),
       body: Stack(
         children: [

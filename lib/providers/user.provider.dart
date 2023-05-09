@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:html' as html;
 
 import 'package:ebutler/classes/locations.class.dart';
 import 'package:ebutler/interfaces/user.interface.dart';
@@ -80,6 +81,16 @@ class UserProvider extends ChangeNotifier implements IUserServices {
     }
   }
 
+  /// Uploads a profile picture to the storage using the provided [path]
+  @override
+  Future<void> uploadProfilePictureWeb(html.File file) async {
+    try {
+      await UserServices().uploadProfilePictureWeb(file);
+    } catch (e) {
+      return Future.error(e);
+    }
+  }
+
   /// Logs out the user completely from the application
   @override
   Future<void> logout() async {
@@ -105,6 +116,27 @@ class UserProvider extends ChangeNotifier implements IUserServices {
     try {
       final List<UserModel> operators = await UserServices().getAllByRole(role);
       return operators;
+    } catch (e) {
+      return Future.error(e);
+    }
+  }
+
+  /// Assigns a provider to a Customer
+  @override
+  Future<void> setOperatorUid(String uid) async {
+    try {
+      await UserServices().setOperatorUid(uid);
+      await getUserDetails();
+    } catch (e) {
+      return Future.error(e);
+    }
+  }
+
+  /// Fetches the Customer's locations
+  @override
+  Future<List<Location>> getClientLocations(String uid) async {
+    try {
+      return await UserServices().getClientLocations(uid);
     } catch (e) {
       return Future.error(e);
     }
